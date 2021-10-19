@@ -10,7 +10,7 @@ import json
 import math
 import nltk
 import numpy as np
-import os
+
 import pdb
 
 from torch.utils.data import Dataset, DataLoader
@@ -101,7 +101,7 @@ class YelpPytorchDataset(Dataset):
 
         # Create map from idx-th data point to item
         item_to_nreviews = load_file(
-            os.path.join(self.ds_conf.processed_path, '{}/store-to-nreviews.json'.format(split)))
+            self.ds_conf.processed_path / f'{split}/store-to-nreviews.json')
         self.idx_to_item = {}
 
         if sample_reviews:
@@ -185,7 +185,7 @@ class YelpPytorchDataset(Dataset):
     def __getitem__(self, idx):
         # Map idx to item and load reviews
         item = self.idx_to_item[idx]  # id
-        fp = os.path.join(self.ds_conf.processed_path, '{}/{}_reviews.json'.format(self.split, item))
+        fp = self.ds_conf.processed_path / self.split /  f'{item}_reviews.json'
         reviews = load_file(fp)
 
         # Get reviews from item
@@ -209,11 +209,11 @@ class YelpPytorchDataset(Dataset):
 
         try:
             categories = '---'.join(self.items[item]['categories'])
+            print(categories)
         except Exception as e:
-            print(e)
             categories = '---'
         metadata = {'item': item,
-                    'city': self.items[item]['city'],
+                    'city': self.items[item].get('city', ''),
                     'categories': categories}
 
         # try:
@@ -355,8 +355,9 @@ class YelpDataset(SummReviewDataset):
 
         print('Filtering reviews longer than: {}'.format(review_max_len))
         item_to_reviews = defaultdict(list)
+
         for r in self.reviews:
-            if len(self.subwordenc.encode(r['text'])) < review_max_len:
+            if len(r['text'].split(' ')) < review_max_len:
                 item_to_reviews[r['business_id']].append(r)
 
         # Calculate target amount of reviews per item
@@ -394,7 +395,7 @@ class YelpDataset(SummReviewDataset):
                 split = 'train'
                 cur_n_tr += n
 
-            out_fp = os.path.join(self.conf.processed_path, '{}/{}_reviews.json'.format(split, item))
+            out_fp = self.conf.processed_path / split /  f'{item}_reviews.json'
             save_file(item_to_reviews[item], out_fp, verbose=False)
 
             split_to_item_to_nreviews[split][item] = n
@@ -405,7 +406,7 @@ class YelpDataset(SummReviewDataset):
 
         # This file is used by YelpPytorchDataset
         for split, item_to_nreviews in split_to_item_to_nreviews.items():
-            out_fp = os.path.join(self.conf.processed_path, '{}/store-to-nreviews.json'.format(split))
+            out_fp = self.conf.processed_path / split / 'store-to-nreviews.json'
             save_file(item_to_nreviews, out_fp)
 
     def print_original_data_stats(self):
@@ -481,20 +482,3 @@ class YelpDataset(SummReviewDataset):
         print('-- 90th percentile: {}'.format(np.percentile(all_rev_lens, 90)))
 
 
-if __name__ == '__main__':
-    from data_loaders.summ_dataset_factory import SummDatasetFactory
-
-    hp = HParams()
-    ds = SummDatasetFactory.get('yelp')
-    ds.save_processed_splits()
-    # ds.print_original_data_stats()
-    # ds.print_filtered_data_stats()
-
-    # Variable batch size and n_docs
-    # test_dl = ds.get_data_loader(split='test', n_docs_min=4, n_docs_max=16, sample_reviews=True,
-    #                              batch_size=1, shuffle=False)
-    # test_dl = ds.get_data_loader(split='test', n_docs=8, sample_reviews=False,
-    #                              batch_size=1, shuffle=False)
-    # for texts, ratings, metadata in test_dl:
-    #     x, lengths, labels = ds.prepare_batch(texts, ratings)
-    #     pdb.set_trace()

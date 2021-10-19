@@ -219,11 +219,11 @@ class AmazonDataset(SummReviewDataset):
             self.reviews, _ = AmazonDataset.load_all_reviews()
 
         # # Note: we actually do more filtering in the Pytorch dataset class
-        print('Filtering reviews longer than: {}'.format(review_max_len))
-        item_to_reviews = defaultdict(list)
-        for r in self.reviews:
-            if len(self.subwordenc.encode(r['reviewText'])) < review_max_len:
-                item_to_reviews[r['asin']].append(r)
+        # print('Filtering reviews longer than: {}'.format(review_max_len))
+        # item_to_reviews = defaultdict(list)
+        # for r in self.reviews:
+        #    if len(self.subwordenc.encode(r['reviewText'])) < review_max_len:
+        #        item_to_reviews[r['asin']].append(r)
 
         # Calculate target amount of reviews per item
         n = sum([len(revs) for revs in item_to_reviews.values()])
@@ -326,19 +326,3 @@ class AmazonDataset(SummReviewDataset):
         print(np.percentile(lens, 90))
         pdb.set_trace()
 
-
-if __name__ == '__main__':
-    from data_loaders.summ_dataset_factory import SummDatasetFactory
-
-    hp = HParams()
-    ds = SummDatasetFactory.get('amazon')
-    # ds.save_processed_splits()
-    ds.print_original_data_stats()
-    # ds.print_filtered_data_stats()
-
-    # test_dl = ds.get_data_loader(split='test', n_docs=8, sample_reviews=True,
-    #                              category='Electronics',
-    #                              batch_size=4, shuffle=True)
-    # for texts, ratings, metadata in test_dl:
-    #     x, lengths, labels = ds.prepare_batch(texts, ratings)
-    #     pdb.set_trace()

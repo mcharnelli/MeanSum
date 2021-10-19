@@ -2,6 +2,13 @@
 
 Corresponding paper, accepted to ICML 2019: [https://arxiv.org/abs/1810.05739](https://arxiv.org/abs/1810.05739).
 
+
+## Steps
+
+1. split_dataset.py
+2. build_subword_encoder.py
+   
+
 ## Requirements
 
 Main requirements:

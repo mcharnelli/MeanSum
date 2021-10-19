@@ -50,6 +50,8 @@ import unicodedata
 import six
 import tensorflow as tf
 from six.moves import range  # pylint: disable=redefined-builtin
+import logging 
+import glob
 
 # Conversion between Unicode and UTF-8, if required (on Python2)
 _native_to_unicode = (lambda s: s.decode("utf-8")) if six.PY2 else (lambda s: s)
@@ -117,10 +119,10 @@ def _read_filepattern(filepattern, max_lines=None, split_on_newlines=True):
       The contents of the files as lines, if split_on_newlines is True, or
       the entire contents of each file if False.
     """
-    filenames = sorted(tf.gfile.Glob(filepattern))
+    filenames = sorted(glob.glob(filepattern))
     lines_read = 0
     for filename in filenames:
-        with tf.gfile.Open(filename) as f:
+        with tf.io.gfile.GFile(filename) as f:
             if split_on_newlines:
                 for line in f:
                     yield line.strip()
@@ -184,7 +186,7 @@ def vocab_token_counts(text_filepattern, max_lines):
     for i, line in enumerate(
             _read_filepattern(text_filepattern, max_lines=max_lines)):
         if "," not in line:
-            tf.logging.warning("Malformed vocab line #%d '%s'", i, line)
+            logging.warning("Malformed vocab line #%d '%s'", i, line)
             continue
 
         token, count = line.rsplit(",", 1)

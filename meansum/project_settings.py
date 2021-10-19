@@ -30,10 +30,10 @@ class DatasetConfig(object):
             self.vocab_size = 32000  # target vocab size when building subwordenc
 
             # Paths
-            self.dir_path = DATASET_PATH / 'yelp_dataset/'
+            self.dir_path = DATASET_PATH / 'yelp_dataset'
             self.reviews_path = DATASET_PATH / 'yelp_dataset' / 'review.json'
             self.businesses_path = DATASET_PATH / 'yelp_dataset' / 'yelp_academic_dataset_review.json'
-            self.processed_path = DATASET_PATH / 'yelp_dataset ' / 'processed'
+            self.processed_path = DATASET_PATH / 'yelp_dataset' / 'processed'
             self.subwordenc_path = DATASET_PATH / 'yelp_dataset' / ' processed'/'subwordenc_32000_maxrevs260_fixed.pkl'
 
             # Trained models

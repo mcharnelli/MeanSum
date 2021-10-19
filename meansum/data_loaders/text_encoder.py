@@ -29,6 +29,7 @@ import re
 import tempfile
 from itertools import chain
 
+import logging
 import numpy as np
 import six
 import tensorflow as tf
@@ -720,7 +721,7 @@ class SubwordTextEncoder(TextEncoder):
         def bisect(min_val, max_val):
             """Bisection to find the right size."""
             present_count = (max_val + min_val) // 2
-            tf.logging.info("Trying min_count %d" % present_count)
+            logging.info("Trying min_count %d" % present_count)
             subtokenizer = cls()
             subtokenizer.build_from_token_counts(
                 token_counts, present_count, num_iterations,
@@ -800,7 +801,7 @@ class SubwordTextEncoder(TextEncoder):
         if min_count < 1:
             min_count = 1
         for i in range(num_iterations):
-            tf.logging.info("Iteration {0}".format(i))
+            logging.info("Iteration {0}".format(i))
 
             # Collect all substrings of the encoded token that break along current
             # subtoken boundaries.
@@ -854,7 +855,7 @@ class SubwordTextEncoder(TextEncoder):
                 new_subtoken_strings = reserved_tokens + new_subtoken_strings
 
             self._init_subtokens_from_list(new_subtoken_strings)
-            tf.logging.info("vocab_size = %d" % self.vocab_size)
+            logging.info("vocab_size = %d" % self.vocab_size)
 
     @property
     def all_subtoken_strings(self):
@@ -965,7 +966,7 @@ class ImageEncoder(object):
         try:
             import matplotlib.image as im  # pylint: disable=g-import-not-at-top
         except ImportError as e:
-            tf.logging.warning(
+            logging.warning(
                 "Reading an image requires matplotlib to be installed: %s", e)
             raise NotImplementedError("Image reading not implemented.")
         return im.imread(s)
